@@ -1,4 +1,4 @@
-const API_URL = "http://127.0.0.1:5000/api/productos";
+const API_URL = "https://proyecto-final-nova-stock-croj.vercel.app/api/productos";
 
 export async function obtenerProductos() {
   const respuesta = await fetch(`${API_URL}/`);
