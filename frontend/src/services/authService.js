@@ -1,5 +1,6 @@
-const API_URL = "http://127.0.0.1:5000/api/auth"
+import { API } from "../config"
 
+const API_URL = `${API}/api/auth`
 
 export async function iniciarSesion(correo, contrasena) {
   const respuesta = await fetch(`${API_URL}/login`, {
@@ -23,7 +24,6 @@ export async function iniciarSesion(correo, contrasena) {
 
   return datos
 }
-
 
 export async function registrarUsuario(
   nombre,
