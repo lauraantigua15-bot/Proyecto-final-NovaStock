@@ -1,4 +1,6 @@
-const API_URL = "http://127.0.0.1:5000/api/movimientos";
+import { API } from "../config";
+
+const API_URL = `${API}/api/movimientos`;
 
 export async function obtenerMovimientos() {
   const respuesta = await fetch(`${API_URL}/`);
@@ -10,7 +12,7 @@ export async function obtenerMovimientos() {
     );
   }
 
-  return datos.movimientos;
+  return datos.movimientos || [];
 }
 
 export async function registrarMovimiento(movimiento) {
@@ -47,5 +49,5 @@ export async function obtenerMovimientosProducto(productoId) {
     );
   }
 
-  return datos.movimientos;
+  return datos.movimientos || [];
 }
