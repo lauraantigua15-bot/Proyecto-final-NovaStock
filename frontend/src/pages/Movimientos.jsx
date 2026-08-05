@@ -210,7 +210,7 @@ function Movimientos({ usuario, volverInicio }) {
 
         <button
           type="button"
-          className="secondary-button"
+          className="refresh-button"
           onClick={cargarDatos}
           disabled={cargando || guardando}
         >
