@@ -1275,12 +1275,33 @@
   }
 }
 
-button.refresh-button {
-  background: #7c3aed !important;
-  color: white !important;
-  border: none !important;
-  border-radius: 10px !important;
-  padding: 12px 22px !important;
-  font-weight: 700 !important;
-  cursor: pointer !important;
+.refresh-button {
+  min-width: 180px;
+  height: 48px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.productos-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 768px) {
+  .productos-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .refresh-button {
+    width: 100%;
+  }
 }

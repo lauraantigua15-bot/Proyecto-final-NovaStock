@@ -28,10 +28,11 @@ function Movimientos({ usuario, volverInicio }) {
       setCargando(true)
       setMensaje("")
 
-      const [datosProductos, datosMovimientos] = await Promise.all([
-        obtenerProductos(),
-        obtenerMovimientos(),
-      ])
+      const [datosProductos, datosMovimientos] =
+        await Promise.all([
+          obtenerProductos(),
+          obtenerMovimientos(),
+        ])
 
       setProductos(datosProductos || [])
       setMovimientos(datosMovimientos || [])
@@ -42,9 +43,9 @@ function Movimientos({ usuario, volverInicio }) {
     }
   }
 
-  function mostrarMensaje(texto, tipo) {
+  function mostrarMensaje(texto, tipoMensajeNuevo) {
     setMensaje(texto)
-    setTipoMensaje(tipo)
+    setTipoMensaje(tipoMensajeNuevo)
 
     setTimeout(() => {
       setMensaje("")
@@ -79,7 +80,10 @@ function Movimientos({ usuario, volverInicio }) {
     evento.preventDefault()
 
     if (!productoId) {
-      mostrarMensaje("Debes seleccionar un producto", "error")
+      mostrarMensaje(
+        "Debes seleccionar un producto",
+        "error"
+      )
       return
     }
 
@@ -97,7 +101,10 @@ function Movimientos({ usuario, volverInicio }) {
     }
 
     if (!productoSeleccionado) {
-      mostrarMensaje("El producto seleccionado no existe", "error")
+      mostrarMensaje(
+        "El producto seleccionado no existe",
+        "error"
+      )
       return
     }
 
@@ -117,6 +124,7 @@ function Movimientos({ usuario, volverInicio }) {
 
     try {
       setGuardando(true)
+      setMensaje("")
 
       const respuesta = await registrarMovimiento({
         producto_id: productoId,
@@ -152,6 +160,10 @@ function Movimientos({ usuario, volverInicio }) {
 
     const fechaMovimiento = new Date(fecha)
 
+    if (Number.isNaN(fechaMovimiento.getTime())) {
+      return fecha
+    }
+
     return fechaMovimiento.toLocaleString("es-DO", {
       day: "2-digit",
       month: "2-digit",
@@ -162,7 +174,9 @@ function Movimientos({ usuario, volverInicio }) {
   }
 
   const totalEntradas = movimientos
-    .filter((movimiento) => movimiento.tipo === "Entrada")
+    .filter(
+      (movimiento) => movimiento.tipo === "Entrada"
+    )
     .reduce(
       (total, movimiento) =>
         total + Number(movimiento.cantidad || 0),
@@ -170,7 +184,9 @@ function Movimientos({ usuario, volverInicio }) {
     )
 
   const totalSalidas = movimientos
-    .filter((movimiento) => movimiento.tipo === "Salida")
+    .filter(
+      (movimiento) => movimiento.tipo === "Salida"
+    )
     .reduce(
       (total, movimiento) =>
         total + Number(movimiento.cantidad || 0),
@@ -210,11 +226,13 @@ function Movimientos({ usuario, volverInicio }) {
 
         <button
           type="button"
-          className="refresh-button"
+          className="primary-button refresh-button"
           onClick={cargarDatos}
           disabled={cargando || guardando}
         >
-          {cargando ? "Actualizando..." : "Actualizar"}
+          {cargando
+            ? "Actualizando..."
+            : "⟳ Actualizar datos"}
         </button>
       </header>
 
@@ -233,19 +251,31 @@ function Movimientos({ usuario, volverInicio }) {
       <section className="stats-grid movimientos-stats">
         <article className="stat-card">
           <p>Total de movimientos</p>
-          <h3>{cargando ? "..." : movimientos.length}</h3>
+
+          <h3>
+            {cargando ? "..." : movimientos.length}
+          </h3>
+
           <span>Registros guardados</span>
         </article>
 
         <article className="stat-card">
           <p>Unidades de entrada</p>
-          <h3>{cargando ? "..." : totalEntradas}</h3>
+
+          <h3>
+            {cargando ? "..." : totalEntradas}
+          </h3>
+
           <span>Unidades agregadas</span>
         </article>
 
         <article className="stat-card">
           <p>Unidades de salida</p>
-          <h3>{cargando ? "..." : totalSalidas}</h3>
+
+          <h3>
+            {cargando ? "..." : totalSalidas}
+          </h3>
+
           <span>Unidades retiradas</span>
         </article>
       </section>
@@ -254,6 +284,7 @@ function Movimientos({ usuario, volverInicio }) {
         <div className="panel-header">
           <div>
             <h3>Gráfico de entradas y salidas</h3>
+
             <p>
               Comparación de las unidades registradas.
             </p>
@@ -302,7 +333,10 @@ function Movimientos({ usuario, volverInicio }) {
           <div className="panel-header">
             <div>
               <h3>Registrar movimiento</h3>
-              <p>Completa los datos del movimiento.</p>
+
+              <p>
+                Completa los datos del movimiento.
+              </p>
             </div>
           </div>
 
@@ -322,6 +356,7 @@ function Movimientos({ usuario, volverInicio }) {
                   setProductoId(evento.target.value)
                 }
                 disabled={guardando || cargando}
+                required
               >
                 <option value="">
                   Selecciona un producto
@@ -343,6 +378,7 @@ function Movimientos({ usuario, volverInicio }) {
               <div className="producto-stock-info">
                 <div>
                   <span>Producto</span>
+
                   <strong>
                     {productoSeleccionado.nombre}
                   </strong>
@@ -350,6 +386,7 @@ function Movimientos({ usuario, volverInicio }) {
 
                 <div>
                   <span>Stock disponible</span>
+
                   <strong>
                     {productoSeleccionado.cantidad}{" "}
                     unidad(es)
@@ -398,6 +435,7 @@ function Movimientos({ usuario, volverInicio }) {
                   }
                   placeholder="Ejemplo: 5"
                   disabled={guardando}
+                  required
                 />
               </div>
             </div>            <div className="form-group">
