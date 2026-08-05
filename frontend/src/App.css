@@ -1274,3 +1274,13 @@
     width: 100%;
   }
 }
+
+button.refresh-button {
+  background: #7c3aed !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 10px !important;
+  padding: 12px 22px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+}
