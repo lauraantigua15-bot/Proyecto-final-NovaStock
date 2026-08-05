@@ -20,7 +20,8 @@ function ProductoForm({
   const [cargandoCategorias, setCargandoCategorias] =
     useState(true);
 
-  const [archivoImagen, setArchivoImagen] = useState(null);
+  const [archivoImagen, setArchivoImagen] =
+    useState(null);
 
   const [vistaPrevia, setVistaPrevia] = useState(
     productoEditar?.imagen || ""
@@ -38,6 +39,7 @@ function ProductoForm({
   async function cargarCategorias() {
     try {
       setCargandoCategorias(true);
+      setMensaje("");
 
       const datos = await obtenerCategorias();
       setCategorias(datos || []);
@@ -58,27 +60,22 @@ function ProductoForm({
   }
 
   function manejarCambioImagen(evento) {
-    const archivo = evento.target.files?.[0];
+    const archivo = evento.target.files[0];
 
     if (!archivo) {
       return;
     }
 
-    const formatosPermitidos = [
-      "image/jpeg",
-      "image/png",
-      "image/webp",
-    ];
-
-    if (!formatosPermitidos.includes(archivo.type)) {
+    if (!archivo.type.startsWith("image/")) {
       setMensaje(
-        "Debes seleccionar una imagen JPG, PNG o WEBP."
+        "Debes seleccionar un archivo de imagen."
       );
       return;
     }
 
     const limiteEnMB = 5;
-    const limiteEnBytes = limiteEnMB * 1024 * 1024;
+    const limiteEnBytes =
+      limiteEnMB * 1024 * 1024;
 
     if (archivo.size > limiteEnBytes) {
       setMensaje(
@@ -90,7 +87,9 @@ function ProductoForm({
     setMensaje("");
     setArchivoImagen(archivo);
 
-    const urlTemporal = URL.createObjectURL(archivo);
+    const urlTemporal =
+      URL.createObjectURL(archivo);
+
     setVistaPrevia(urlTemporal);
   }
 
@@ -111,9 +110,8 @@ function ProductoForm({
       let urlImagen = formulario.imagen;
 
       if (archivoImagen) {
-        urlImagen = await subirImagenProducto(
-          archivoImagen
-        );
+        urlImagen =
+          await subirImagenProducto(archivoImagen);
       }
 
       await guardarProducto({
@@ -169,7 +167,6 @@ function ProductoForm({
               type="text"
               value={formulario.nombre}
               onChange={manejarCambio}
-              placeholder="Ejemplo: Monitor Samsung"
               required
             />
           </div>
@@ -184,7 +181,6 @@ function ProductoForm({
               name="descripcion"
               value={formulario.descripcion}
               onChange={manejarCambio}
-              placeholder="Escribe una descripción breve del producto"
               rows="4"
             />
           </div>
@@ -203,7 +199,6 @@ function ProductoForm({
                 step="0.01"
                 value={formulario.precio}
                 onChange={manejarCambio}
-                placeholder="0.00"
                 required
               />
             </div>
@@ -221,7 +216,6 @@ function ProductoForm({
                 step="1"
                 value={formulario.cantidad}
                 onChange={manejarCambio}
-                placeholder="0"
                 required
               />
             </div>
@@ -259,8 +253,8 @@ function ProductoForm({
             {!cargandoCategorias &&
               categorias.length === 0 && (
                 <small>
-                  No hay categorías registradas. Crea una
-                  categoría primero.
+                  No hay categorías registradas.
+                  Crea una categoría primero.
                 </small>
               )}
           </div>
@@ -275,14 +269,14 @@ function ProductoForm({
                 id="imagen"
                 name="imagen"
                 type="file"
-                accept=".jpg,.jpeg,.png,.webp"
+                accept="image/*"
                 onChange={manejarCambioImagen}
               />
             </div>
 
             <small>
-              Selecciona una imagen JPG, PNG o WEBP de
-              máximo 5 MB.
+              Selecciona una imagen JPG, PNG o WEBP
+              de máximo 5 MB.
             </small>
           </div>
 
