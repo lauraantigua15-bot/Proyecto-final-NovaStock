@@ -17,6 +17,11 @@ function Dashboard({
   const [cargando, setCargando] = useState(true)
   const [mensaje, setMensaje] = useState("")
 
+  const [
+    categoriaSeleccionada,
+    setCategoriaSeleccionada,
+  ] = useState("Todas")
+
   useEffect(() => {
     cargarDatosDashboard()
   }, [])
@@ -91,6 +96,14 @@ function Dashboard({
     .sort((categoriaA, categoriaB) => {
       return categoriaB.cantidad - categoriaA.cantidad
     })
+
+  const datosGraficoFiltrados =
+    categoriaSeleccionada === "Todas"
+      ? datosGrafico.slice(0, 5)
+      : datosGrafico.filter(
+          (categoria) =>
+            categoria.nombre === categoriaSeleccionada
+        )
 
   const cantidadMayor =
     datosGrafico.length > 0
@@ -264,7 +277,9 @@ function Dashboard({
               {cargando ? "..." : totalProductos}
             </h3>
 
-            <span>Ver productos registrados →</span>
+            <span>
+              Ver productos registrados →
+            </span>
           </button>
 
           <button
@@ -280,7 +295,9 @@ function Dashboard({
               {cargando ? "..." : totalCategorias}
             </h3>
 
-            <span>Ver categorías registradas →</span>
+            <span>
+              Ver categorías registradas →
+            </span>
           </button>
 
           <button
@@ -403,7 +420,7 @@ function Dashboard({
           </section>
 
           <section className="dashboard-panel chart-panel">
-            <div className="panel-header">
+            <div className="panel-header categorias-panel-header">
               <div>
                 <h3>Productos por categoría</h3>
 
@@ -411,13 +428,36 @@ function Dashboard({
                   Distribución actual del inventario
                 </p>
               </div>
+
+              <select
+                className="category-filter"
+                value={categoriaSeleccionada}
+                onChange={(evento) =>
+                  setCategoriaSeleccionada(
+                    evento.target.value
+                  )
+                }
+              >
+                <option value="Todas">
+                  Todas
+                </option>
+
+                {datosGrafico.map((categoria) => (
+                  <option
+                    key={categoria.nombre}
+                    value={categoria.nombre}
+                  >
+                    {categoria.nombre}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {cargando ? (
               <div className="empty-state">
                 <h4>Cargando gráfico...</h4>
               </div>
-            ) : datosGrafico.length === 0 ? (
+            ) : datosGraficoFiltrados.length === 0 ? (
               <div className="empty-state">
                 <h4>No hay datos para mostrar</h4>
 
@@ -427,39 +467,51 @@ function Dashboard({
                 </p>
               </div>
             ) : (
-              <div className="category-chart">
-                {datosGrafico.map((categoria) => {
-                  const porcentaje =
-                    cantidadMayor > 0
-                      ? (categoria.cantidad /
-                          cantidadMayor) *
-                        100
-                      : 0
+              <div className="category-chart category-chart-limited">
+                {datosGraficoFiltrados.map(
+                  (categoria) => {
+                    const porcentaje =
+                      cantidadMayor > 0
+                        ? (categoria.cantidad /
+                            cantidadMayor) *
+                          100
+                        : 0
 
-                  return (
-                    <div
-                      className="chart-row"
-                      key={categoria.nombre}
-                    >
-                      <div className="chart-row-header">
-                        <span>{categoria.nombre}</span>
+                    return (
+                      <div
+                        className="chart-row"
+                        key={categoria.nombre}
+                      >
+                        <div className="chart-row-header">
+                          <span>
+                            {categoria.nombre}
+                          </span>
 
-                        <strong>
-                          {categoria.cantidad}
-                        </strong>
+                          <strong>
+                            {categoria.cantidad}
+                          </strong>
+                        </div>
+
+                        <div className="chart-track">
+                          <div
+                            className="chart-bar"
+                            style={{
+                              width: `${porcentaje}%`,
+                            }}
+                          />
+                        </div>
                       </div>
+                    )
+                  }
+                )}
 
-                      <div className="chart-track">
-                        <div
-                          className="chart-bar"
-                          style={{
-                            width: `${porcentaje}%`,
-                          }}
-                        />
-                      </div>
-                    </div>
-                  )
-                })}
+                {categoriaSeleccionada === "Todas" &&
+                  datosGrafico.length > 5 && (
+                    <p className="category-chart-note">
+                      Mostrando las 5 categorías con más
+                      productos.
+                    </p>
+                  )}
               </div>
             )}
           </section>
