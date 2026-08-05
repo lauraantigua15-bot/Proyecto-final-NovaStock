@@ -17,9 +17,11 @@ function ProductoForm({
   });
 
   const [categorias, setCategorias] = useState([]);
-  const [cargandoCategorias, setCargandoCategorias] = useState(true);
+  const [cargandoCategorias, setCargandoCategorias] =
+    useState(true);
 
   const [archivoImagen, setArchivoImagen] = useState(null);
+
   const [vistaPrevia, setVistaPrevia] = useState(
     productoEditar?.imagen || ""
   );
@@ -38,7 +40,7 @@ function ProductoForm({
       setCargandoCategorias(true);
 
       const datos = await obtenerCategorias();
-      setCategorias(datos);
+      setCategorias(datos || []);
     } catch (error) {
       setMensaje(error.message);
     } finally {
@@ -56,14 +58,22 @@ function ProductoForm({
   }
 
   function manejarCambioImagen(evento) {
-    const archivo = evento.target.files[0];
+    const archivo = evento.target.files?.[0];
 
     if (!archivo) {
       return;
     }
 
-    if (!archivo.type.startsWith("image/")) {
-      setMensaje("Debes seleccionar un archivo de imagen.");
+    const formatosPermitidos = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+    ];
+
+    if (!formatosPermitidos.includes(archivo.type)) {
+      setMensaje(
+        "Debes seleccionar una imagen JPG, PNG o WEBP."
+      );
       return;
     }
 
@@ -71,20 +81,26 @@ function ProductoForm({
     const limiteEnBytes = limiteEnMB * 1024 * 1024;
 
     if (archivo.size > limiteEnBytes) {
-      setMensaje("La imagen no puede pesar más de 5 MB.");
+      setMensaje(
+        "La imagen no puede pesar más de 5 MB."
+      );
       return;
     }
 
     setMensaje("");
     setArchivoImagen(archivo);
-    setVistaPrevia(URL.createObjectURL(archivo));
+
+    const urlTemporal = URL.createObjectURL(archivo);
+    setVistaPrevia(urlTemporal);
   }
 
   async function manejarEnvio(evento) {
     evento.preventDefault();
 
     if (!formulario.categoria) {
-      setMensaje("Debes seleccionar una categoría.");
+      setMensaje(
+        "Debes seleccionar una categoría."
+      );
       return;
     }
 
@@ -95,7 +111,9 @@ function ProductoForm({
       let urlImagen = formulario.imagen;
 
       if (archivoImagen) {
-        urlImagen = await subirImagenProducto(archivoImagen);
+        urlImagen = await subirImagenProducto(
+          archivoImagen
+        );
       }
 
       await guardarProducto({
@@ -117,7 +135,9 @@ function ProductoForm({
         <div className="producto-form-header">
           <div>
             <h3>
-              {esEdicion ? "Editar producto" : "Agregar producto"}
+              {esEdicion
+                ? "Editar producto"
+                : "Agregar producto"}
             </h3>
 
             <p>
@@ -131,6 +151,7 @@ function ProductoForm({
             type="button"
             className="close-button"
             onClick={cerrarFormulario}
+            disabled={cargando}
           >
             ×
           </button>
@@ -138,7 +159,9 @@ function ProductoForm({
 
         <form onSubmit={manejarEnvio}>
           <div className="form-group">
-            <label htmlFor="nombre">Nombre</label>
+            <label htmlFor="nombre">
+              Nombre
+            </label>
 
             <input
               id="nombre"
@@ -146,24 +169,31 @@ function ProductoForm({
               type="text"
               value={formulario.nombre}
               onChange={manejarCambio}
+              placeholder="Ejemplo: Monitor Samsung"
               required
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="descripcion">Descripción</label>
+            <label htmlFor="descripcion">
+              Descripción
+            </label>
 
             <textarea
               id="descripcion"
               name="descripcion"
               value={formulario.descripcion}
               onChange={manejarCambio}
+              placeholder="Escribe una descripción breve del producto"
+              rows="4"
             />
           </div>
 
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="precio">Precio</label>
+              <label htmlFor="precio">
+                Precio
+              </label>
 
               <input
                 id="precio"
@@ -173,12 +203,15 @@ function ProductoForm({
                 step="0.01"
                 value={formulario.precio}
                 onChange={manejarCambio}
+                placeholder="0.00"
                 required
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor="cantidad">Cantidad</label>
+              <label htmlFor="cantidad">
+                Cantidad
+              </label>
 
               <input
                 id="cantidad"
@@ -188,13 +221,16 @@ function ProductoForm({
                 step="1"
                 value={formulario.cantidad}
                 onChange={manejarCambio}
+                placeholder="0"
                 required
               />
             </div>
           </div>
 
           <div className="form-group">
-            <label htmlFor="categoria">Categoría</label>
+            <label htmlFor="categoria">
+              Categoría
+            </label>
 
             <select
               id="categoria"
@@ -220,11 +256,13 @@ function ProductoForm({
               ))}
             </select>
 
-            {!cargandoCategorias && categorias.length === 0 && (
-              <small>
-                No hay categorías registradas. Crea una categoría primero.
-              </small>
-            )}
+            {!cargandoCategorias &&
+              categorias.length === 0 && (
+                <small>
+                  No hay categorías registradas. Crea una
+                  categoría primero.
+                </small>
+              )}
           </div>
 
           <div className="form-group">
@@ -232,16 +270,19 @@ function ProductoForm({
               Imagen del producto
             </label>
 
-            <input
-              id="imagen"
-              name="imagen"
-              type="file"
-              accept="image/*"
-              onChange={manejarCambioImagen}
-            />
+            <div className="file-input-container">
+              <input
+                id="imagen"
+                name="imagen"
+                type="file"
+                accept=".jpg,.jpeg,.png,.webp"
+                onChange={manejarCambioImagen}
+              />
+            </div>
 
             <small>
-              Selecciona una imagen JPG, PNG o WEBP de máximo 5 MB.
+              Selecciona una imagen JPG, PNG o WEBP de
+              máximo 5 MB.
             </small>
           </div>
 
@@ -258,7 +299,7 @@ function ProductoForm({
           )}
 
           {mensaje && (
-            <p className="productos-message">
+            <p className="productos-message error">
               {mensaje}
             </p>
           )}
